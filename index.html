@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123c35">
+  <meta name="description" content="TSS Field Report - laporan monitoring Sediment Pond offline-first">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <title>TSS Field Report</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#172522;background:#f2f6f4}
+    *{box-sizing:border-box} body{margin:0} header{background:#123c35;color:white;padding:20px 16px 24px}
+    header h1{font-size:22px;margin:0 0 5px} header p{margin:0;color:#d6e8e1;font-size:13px}
+    main{max-width:720px;margin:auto;padding:14px}
+    .card{background:white;border-radius:16px;padding:16px;margin:0 0 14px;box-shadow:0 3px 14px #173b3010}
+    h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    label{display:block;font-size:13px;font-weight:650;margin-bottom:6px}
+    input,select,textarea{width:100%;border:1px solid #cbd8d2;border-radius:10px;padding:12px;font:inherit;font-size:16px;background:#fff;color:#172522}
+    textarea{min-height:78px;resize:vertical}.field{margin-bottom:13px}
+    button{border:0;border-radius:11px;padding:13px 15px;font-size:15px;font-weight:700;cursor:pointer}
+    .primary{background:#146c52;color:#fff;width:100%}.share{background:#16834f;color:white;width:100%}
+    .secondary{background:#e8f0ec;color:#174c3c}.danger{background:#ffeded;color:#a32929}
+    .row{display:flex;gap:8px;align-items:center}.row button{flex:1}
+    .status{font-size:13px;padding:9px 11px;border-radius:9px;background:#edf4f0;margin-top:10px}
+    .online{color:#12623d}.offline{color:#a15c00}.small{font-size:12px;color:#63736d}
+    .report{border:1px solid #e1e9e5;border-radius:12px;padding:12px;margin-top:10px}
+    .report strong{display:block;font-size:14px}.report p{font-size:12px;color:#62716b;margin:5px 0}
+    .thumb{max-width:100%;max-height:180px;border-radius:9px;margin-top:8px}
+    .pill{font-size:11px;border-radius:30px;padding:4px 8px;background:#fff0d8;color:#805300}
+    footer{text-align:center;color:#78857f;font-size:11px;padding:10px 0 24px}
+    @media(max-width:480px){.grid{grid-template-columns:1fr 1fr} main{padding:10px} header{padding:18px 14px}}
+  </style>
+</head>
+<body>
+<header>
+  <h1>TSS Field Report</h1>
+  <p>Monitoring Sediment Pond · Offline-first · Android & iPhone</p>
+</header>
+<main>
+  <section class="card">
+    <h2>Formulir laporan</h2>
+    <form id="reportForm">
+      <div class="grid">
+        <div class="field"><label for="tanggal">Tanggal & waktu</label><input id="tanggal" type="datetime-local" required></div>
+        <div class="field"><label for="pic">Nama PIC</label><input id="pic" placeholder="Nama petugas" autocomplete="name" required></div>
+      </div>
+      <div class="field"><label for="lokasi">Lokasi Sediment Pond</label>
+        <select id="lokasi" required>
+          <option value="">Pilih lokasi</option>
+          <option>SP12 (BLP)</option><option>SP05 (BLP)</option><option>SP16 (BLP)</option>
+          <option>SP20 (BLP)</option><option>SP08 (270)</option><option>SP17 (SST)</option>
+          <option>SP10 (SST)</option><option>SP16 (SST)</option><option>SP07 (SST)</option>
+        </select>
+      </div>
+      <div class="grid">
+        <div class="field"><label for="inlet">TSS Inlet (mg/L)</label><input id="inlet" type="number" min="0" step="any" placeholder="Contoh: 12000" required></div>
+        <div class="field"><label for="outlet">TSS Outlet (mg/L)</label><input id="outlet" type="number" min="0" step="any" placeholder="Contoh: 150" required></div>
+      </div>
+      <div class="field"><label for="ph">pH Outlet</label><input id="ph" type="number" min="0" max="14" step="0.01" placeholder="0–14" required></div>
+
+      <div class="field">
+        <label>Penggunaan Chemical</label>
+        <div class="grid">
+          <div>
+            <label for="tawas" class="small">Tawas (karung)</label>
+            <input id="tawas" type="number" min="0" step="any" value="0" placeholder="Jumlah karung" required>
+          </div>
+          <div>
+            <label for="flokullan" class="small">Flokullan (kg)</label>
+            <input id="flokullan" type="number" min="0" step="any" value="0" placeholder="Jumlah kg" required>
+          </div>
+        </div>
+        <div class="small">Isi 0 apabila tidak ada penggunaan chemical pada periode laporan.</div>
+      </div>
+
+      <div class="field"><label for="foto">Foto dokumentasi</label><input id="foto" type="file" accept="image/*" capture="environment" required><div class="small">Foto dikompresi dan disimpan di perangkat. Maksimum 8 MB sebelum kompresi.</div><img id="preview" class="thumb" hidden></div>
+      <div class="field"><label for="catatan">Keterangan (opsional)</label><textarea id="catatan" placeholder="Kondisi kolam, tindakan, atau catatan lainnya"></textarea></div>
+      <button class="primary" type="submit">Simpan laporan di perangkat</button>
+    </form>
+    <div id="saveStatus" class="status">Data akan disimpan lokal pada perangkat ini.</div>
+  </section>
+
+  <section class="card">
+    <h2>Status aplikasi</h2>
+    <div id="network" class="status">Memeriksa koneksi...</div>
+    <div id="storage" class="small" style="margin-top:8px">Memuat antrean lokal...</div>
+    <p class="small">Laporan yang tersimpan tetap ada saat aplikasi ditutup atau perangkat offline. Jangan hapus data situs/browser sebelum laporan dibagikan.</p>
+  </section>
+
+  <section class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">Antrean laporan</h2><button class="secondary" id="refreshBtn" type="button">Perbarui</button></div>
+    <div id="reports"><p class="small">Belum ada laporan.</p></div>
+  </section>
+</main>
+<footer>TSS Field Report · Penyimpanan lokal pada perangkat petugas</footer>
+<script src="app.js"></script>
+</body>
+</html>
